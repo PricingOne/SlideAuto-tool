@@ -175,138 +175,148 @@
     
 #     # Run the Flask app
 #     app.run(debug=False, port=5001)
-
 import requests
 import os
 import json
 import threading
 import time
 from datetime import datetime, timedelta
-import zipfile
-import shutil
 
-class SilentUpdater:
-    def __init__(self, update_url, check_interval_hours=24):
-        self.update_url = update_url  # Your server endpoint
-        self.check_interval = check_interval_hours
-        self.version_file = "app_version.json"
-        self.updating = False
+class GitHubAutoUpdater:
+    def __init__(self, github_username, repo_name, branch="main"):
+        self.github_username = github_username  # Your GitHub username
+        self.repo_name = repo_name  # Your repository name
+        self.branch = branch
+        self.base_url = f"https://api.github.com/repos/{github_username}/{repo_name}"
+        self.raw_base_url = f"https://raw.githubusercontent.com/{github_username}/{repo_name}/{branch}"
         
-    def get_local_version_info(self):
-        """Get current version and last check time"""
+    def get_latest_commit_id(self):
+        """Check what's the latest version on GitHub"""
         try:
-            if os.path.exists(self.version_file):
-                with open(self.version_file, 'r') as f:
-                    return json.load(f)
-        except:
-            pass
-        return {
-            "version": "0.0.0",
-            "last_check": None,
-            "notebooks_hash": None
-        }
-    
-    def should_check_for_updates(self):
-        """Check if it's time to look for updates"""
-        info = self.get_local_version_info()
-        
-        if not info.get("last_check"):
-            return True
-            
-        last_check = datetime.fromisoformat(info["last_check"])
-        return datetime.now() - last_check > timedelta(hours=self.check_interval)
-    
-    def check_updates_available(self):
-        """Silently check if updates are available"""
-        try:
-            response = requests.get(self.update_url, timeout=10)
+            url = f"{self.base_url}/commits/{self.branch}"
+            response = requests.get(url, timeout=10)
             if response.status_code == 200:
-                remote_info = response.json()
-                local_info = self.get_local_version_info()
-                
-                # Compare versions or hashes
-                return (
-                    remote_info.get("version") != local_info.get("version") or
-                    remote_info.get("notebooks_hash") != local_info.get("notebooks_hash")
-                ), remote_info
+                return response.json()['sha'][:10]  # Short commit ID
         except:
             pass
-        return False, None
+        return None
     
-    def download_file(self, url, local_path):
-        """Download a single file"""
+    def get_current_version(self):
+        """Check what version we have locally"""
         try:
+            with open('current_version.txt', 'r') as f:
+                return f.read().strip()
+        except:
+            return None
+    
+    def download_notebook(self, notebook_path):
+        """Download a single notebook from GitHub"""
+        try:
+            # Convert local path to GitHub raw URL
+            url = f"{self.raw_base_url}/{notebook_path}"
+            
+            print(f"Downloading: {notebook_path}")
             response = requests.get(url, timeout=30)
-            response.raise_for_status()
             
-            # Create directories if needed
-            os.makedirs(os.path.dirname(local_path), exist_ok=True)
-            
-            with open(local_path, 'wb') as f:
-                f.write(response.content)
-            return True
+            if response.status_code == 200:
+                # Create folder if it doesn't exist
+                folder = os.path.dirname(notebook_path)
+                if folder and not os.path.exists(folder):
+                    os.makedirs(folder, exist_ok=True)
+                
+                # Save the file
+                with open(notebook_path, 'w', encoding='utf-8') as f:
+                    f.write(response.text)
+                
+                print(f"✓ Updated: {notebook_path}")
+                return True
+            else:
+                print(f"✗ Failed to download: {notebook_path}")
+                return False
         except Exception as e:
-            print(f"Failed to download {url}: {e}")
+            print(f"Error downloading {notebook_path}: {e}")
             return False
     
-    def update_notebooks(self, remote_info):
-        """Silently update all notebooks"""
-        updated_files = []
+    def update_all_notebooks(self):
+        """Download all your notebooks from GitHub"""
         
-        for notebook in remote_info.get("notebooks", []):
-            local_path = notebook["path"]
-            download_url = notebook["download_url"]
-            
-            if self.download_file(download_url, local_path):
-                updated_files.append(local_path)
+        # List of all your notebook files (you need to list them here)
+        notebooks_to_update = [
+            "Assortment/Assortment Duplicate.ipynb",
+            "Assortment/Assortment Replacement Function.ipynb",
+            "Assortment/Assortment Extracting Data.ipynb",
+            "Pricing CBC/Pricing CBC Duplicate.ipynb",
+            "Pricing CBC/Pricing CBC Replacement Function.ipynb",
+            "Innovation CBC/Innovation CBC Duplicate.ipynb",
+            "Innovation CBC/Innovation CBC Replacement Function.ipynb",
+            "PPA/PPA Duplicate.ipynb",
+            "PPA/PPA Replacement Function.ipynb",
+            "PPA/PPA Extracting Data.ipynb",
+            "Financials/Financials Duplicate.ipynb",
+            "Financials/Financials Replacement Function.ipynb",
+            "Financials/Financials Extracting Data.ipynb",
+            "Pricing/Pricing Duplicate.ipynb",
+            "Pricing/Pricing Replacement Function.ipynb",
+            "Pricing/Pricing Extracting Data.ipynb",
+            "Landscape/Landscape Duplicate.ipynb",
+            "Landscape/Landscape Replacement Function.ipynb",
+            "Landscape/Landscape Extracting Data.ipynb",
+            "Promotion/Promotion Duplicate.ipynb",
+            "Promotion/Promotion Replacement Function.ipynb",
+            "Promotion/Promotion Extracting Data.ipynb"
+        ]
         
-        # Update version info
-        version_info = {
-            "version": remote_info["version"],
-            "notebooks_hash": remote_info["notebooks_hash"],
-            "last_check": datetime.now().isoformat(),
-            "last_update": datetime.now().isoformat(),
-            "updated_files": updated_files
-        }
+        updated_count = 0
+        for notebook in notebooks_to_update:
+            if self.download_notebook(notebook):
+                updated_count += 1
         
-        with open(self.version_file, 'w') as f:
-            json.dump(version_info, f, indent=2)
-        
-        return len(updated_files)
+        return updated_count
     
-    def background_update_check(self):
-        """Run update check in background thread"""
-        if self.updating or not self.should_check_for_updates():
-            return
+    def save_current_version(self, version):
+        """Remember what version we just downloaded"""
+        with open('current_version.txt', 'w') as f:
+            f.write(version)
+    
+    def check_and_update(self):
+        """Main function: Check if updates available and download them"""
+        print("Checking for updates...")
         
-        self.updating = True
+        latest_version = self.get_latest_commit_id()
+        current_version = self.get_current_version()
         
-        try:
-            has_updates, remote_info = self.check_updates_available()
+        if latest_version and latest_version != current_version:
+            print(f"New version available: {latest_version}")
+            print("Downloading updates...")
             
-            if has_updates and remote_info:
-                print("Silently updating notebooks...")
-                updated_count = self.update_notebooks(remote_info)
-                print(f"Updated {updated_count} files silently")
+            updated_count = self.update_all_notebooks()
+            
+            if updated_count > 0:
+                self.save_current_version(latest_version)
+                print(f"✓ Successfully updated {updated_count} files!")
+                return True
             else:
-                # Update last check time even if no updates
-                info = self.get_local_version_info()
-                info["last_check"] = datetime.now().isoformat()
-                with open(self.version_file, 'w') as f:
-                    json.dump(info, f, indent=2)
-        
-        finally:
-            self.updating = False
-    
-    def start_background_updater(self):
-        """Start the background update service"""
-        def update_loop():
-            while True:
-                self.background_update_check()
-                time.sleep(3600)  # Check every hour, but respects check_interval
-        
-        thread = threading.Thread(target=update_loop, daemon=True)
-        thread.start()
+                print("✗ Update failed")
+                return False
+        else:
+            print("✓ Already up to date")
+            return False
+
+# Add this to your main Flask app file (new_app.py)
+
+# At the top, add the updater
+updater = GitHubAutoUpdater(
+    github_username="PricingOne",  # Replace with your GitHub username
+    repo_name="SlideAuto-tool",              # Replace with your repository name
+    branch="main"                            # Your branch name
+)
+
+def auto_update_in_background():
+    """Run this once when app starts"""
+    try:
+        updater.check_and_update()
+    except Exception as e:
+        print(f"Auto-update failed: {e}")
 
 from flask import Flask, render_template, flash, redirect, url_for, request 
 from flask_wtf import FlaskForm
@@ -554,20 +564,18 @@ def open_browser():
     webbrowser.open('http://127.0.0.1:5001')
 
 if __name__ == "__main__":
-    # Start silent updater immediately
-    updater.start_background_updater()
+    # Check for updates when app starts (runs in background)
+    update_thread = threading.Thread(target=auto_update_in_background, daemon=True)
+    update_thread.start()
     
-    # Do initial update check
-    threading.Thread(target=updater.background_update_check, daemon=True).start()
-    
-    # Start browser
+    # Start browser opening in a separate thread
     threading.Thread(target=open_browser).start()
     
-    # Run Flask app
+    # Run the Flask app
     app.run(debug=False, port=5001)
 
-    # # Start browser opening in a separate thread
-    # threading.Thread(target=open_browser).start()
-    
-    # # Run the Flask app
-    # app.run(debug=False, port=5001)
+# if __name__ == "__main__":
+#     # # Start browser opening in a separate thread
+#     threading.Thread(target=open_browser).start()
+#     # # Run the Flask app
+#     app.run(debug=False, port=5001)
