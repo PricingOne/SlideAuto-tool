@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slide Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #00a097;
+            --primary-dark: #008a7e;
+            --secondary-color: #f8f9fa;
+            --accent-color: #e3f2fd;
+            --text-dark: #2c3e50;
+            --shadow-light: 0 2px 10px rgba(0, 160, 151, 0.1);
+            --shadow-medium: 0 4px 20px rgba(0, 160, 151, 0.15);
+            --shadow-strong: 0 8px 30px rgba(0, 160, 151, 0.2);
+        }
+
+        * {
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 160, 151, 0.1);
+            box-shadow: var(--shadow-light);
+        }
+
+        .navbar-brand img {
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-brand img:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-link {
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::before {
+            width: 100%;
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: var(--shadow-strong);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            margin: 2rem auto;
+            max-width: 900px;
+        }
+
+        .container-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+
+        .container-header h2 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container-header .subtitle {
+            margin-top: 0.5rem;
+            opacity: 0.9;
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-container {
+            padding: 2.5rem;
+        }
+
+        .form-section {
+            background: rgba(248, 249, 250, 0.5);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0, 160, 151, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .form-section:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label i {
+            color: var(--primary-color);
+        }
+
+        .form-control, .form-select {
+            border: 2px solid rgba(0, 160, 151, 0.2);
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.75rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5r
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(0, 160, 151, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .checklist-container {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 160, 151, 0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .checklist-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .checklist-container::-webkit-scrollbar-track {
+            background: rgba(0, 160, 151, 0.1);
+            border-radius: 3px;
+        }
+
+        .checklist-container::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        .checklist-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .form-check {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(0, 160, 151, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .form-check:hover {
+            background: rgba(0, 160, 151, 0.05);
+            transform: translateX(5px);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(0, 160, 151, 0.25);
+        }
+
+        .select-all-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-radius: 10px !important;
+            margin-bottom: 1rem !important;
+        }
+
+        .select-all-section .form-check-label {
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.1);
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.1);
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-down {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .progress-step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 160, 151, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .progress-line {
+            width: 50px;
+            height: 2px;
+            background: rgba(0, 160, 151, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .progress-line.active {
+            background: var(--primary-color);
+        }
+
+        .form-check {
+            position: relative;
+        }
+
+        .slide-preview {
+            position: fixed;
+            display: none;
+            z-index: 99999 !important;
+            background: white;
+            border: 3px solid var(--primary-color);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            max-width: 900px;
+            max-height: 600px;
+            pointer-events: none;
+        }
+
+        .slide-preview img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            display: block;
+        }
+
+        .slide-preview-title {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 12px;
+            margin: -10px -10px 10px -10px;
+            border-radius: 7px 7px 0 0;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-check-label {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .form-check-label:hover {
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                border-radius: 15px;
+            }
+            
+            .container-header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .form-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid">
+            <img class="navbar-brand" style="position: absolute; top: 5px; left: 15px; width: 50px; height: 50px;" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMf4iRMpdjqPQE7H_YEYHJs1dNTPb01ghA8A&s" alt="Logo">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" style="color: rgb(0, 0, 0);" href="#"><i class="fas fa-home me-1"></i>Home</a></li>
+                    <li class="nav-item"><a class="nav-link" style="color: rgb(0, 0, 0);" href="#"><i class="fas fa-info-circle me-1"></i>About</a></li>
+                    <li class="nav-item"><a class="nav-link" style="color: rgb(0, 0, 0);" href="#"><i class="fas fa-envelope me-1"></i>Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container" style="margin-top: 100px;">
+        <div class="container-header">
+            <h2><i class="fas fa-chart-line me-2"></i>Generate Your Slides</h2>
+            <p class="subtitle">Upload your data and create professional presentations</p>
+        </div>
+        
+        <div class="form-container">
+            <div class="progress-indicator">
+                <div class="progress-step active" id="step1">1</div>
+                <div class="progress-line" id="line1"></div>
+                <div class="progress-step" id="step2">2</div>
+                <div class="progress-line" id="line2"></div>
+                <div class="progress-step" id="step3">3</div>
+            </div>
+
+            <form action="/" method="POST" enctype="multipart/form-data" id="uploadForm" onsubmit="return validateForm()">
+                {{ form.hidden_tag() }}
+                
+                <div class="form-section fade-in">
+                    <label class="form-label">
+                        <i class="fas fa-upload"></i>
+                        {{ form.file.label.text }}
+                    </label>
+                    {{ form.file(class="form-control", accept=".csv, .xlsx", onchange="showDropdown(this)") }}
+                    <small class="form-text text-muted mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Supported formats: CSV, XLSX
+                    </small>
+                </div>
+
+                <div class="form-section slide-down" id="dropdownDiv" style="display: none;">
+                    <label for="dropdown" class="form-label">
+                        <i class="fas fa-list"></i>
+                        Which section do you want to create?
+                    </label>
+                    {{ form.dropdown(class="form-select", id="dropdown", onchange="showParams(this)") }}
+                </div>
+
+                <div class="form-section slide-down" id="pricingCbcDiv" style="display: none;">
+                    <label class="form-label">
+                        <i class="fas fa-file-alt"></i>
+                        Upload Pricing CBC Dataset
+                    </label>
+                    {{ form.pricing_cbc_file(class="form-control", accept=".csv, .xlsx") }}
+                    <small class="form-text text-muted mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Required only for Pricing CBC
+                    </small>
+                </div>
+
+                <div class="form-section slide-down" id="innovationCbcDiv" style="display: none;">
+                    <label class="form-label">
+                        <i class="fas fa-flask"></i>
+                        Upload Innovation CBC Dataset
+                    </label>
+                    {{ form.innovation_cbc_file(class="form-control", accept=".csv, .xlsx") }}
+                    <small class="form-text text-muted mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Required only for Innovation CBC
+                    </small>
+                </div>
+                <!-- Pricing CBC Checklist -->
+                <div id="pricingCbcChecklist" class="form-section slide-down" style="display: none;">
+                    <div class="checklist-container">
+                        <div class="checklist-title">
+                            <i class="fas fa-tasks me-2"></i>
+                            Select Pricing CBC slides to generate:
+                        </div>
+                        
+                        <div class="form-check select-all-section">
+                            <input class="form-check-input" type="checkbox" id="selectAllPricingCbc" onchange="toggleAllSlides(this, 'pricing_cbc_slides')">
+                            <label class="form-check-label" for="selectAllPricingCbc">
+                                <strong><i class="fas fa-check-double me-2"></i>Select All</strong>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Brand Elasticity" id="slide1" name="pricing_cbc_slides">
+                            <label class="form-check-label" for="slide1">Brand Elasticity</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Brand Sourcing Analysis" id="slide2" name="pricing_cbc_slides">
+                            <label class="form-check-label" for="slide2">Brand Sourcing Analysis</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Product Sourcing Analysis" id="slide3" name="pricing_cbc_slides">
+                            <label class="form-check-label" for="slide3">Product Sourcing Analysis</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Elasticity Curve" id="slide4" name="pricing_cbc_slides">
+                            <label class="form-check-label" for="slide4">Price Elasticity Curve</label>
+                        </div>
+                       <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Revenue Response Analysis" id="slide5" name="pricing_cbc_slides">
+                            <label class="form-check-label" for="slide5">Revenue Response Analysis</label>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <div id="innovationCbcChecklist" class="form-section slide-down" style="display: none;">
+                    <div class="checklist-container">
+                        <div class="checklist-title">
+                            <i class="fas fa-tasks me-2"></i>
+                            Select Innovation CBC slides to generate:
+                        </div>
+                        
+                        <div class="form-check select-all-section">
+                            <input class="form-check-input" type="checkbox" id="selectAllInnovationCbc" onchange="toggleAllSlides(this, 'innovation_cbc_slides')">
+                            <label class="form-check-label" for="selectAllInnovationCbc">
+                                <strong><i class="fas fa-check-double me-2"></i>Select All</strong>
+                            </label>
+                        </div>
+                        <div class="form-check"> 
+                            <input class="form-check-input" type="checkbox" value="Innovation Summary" id="innovationSlide1" name="innovation_cbc_slides">
+                            <label class="form-check-label" for="innovationSlide1">Innovation Summary</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Innovation ranking" id="innovationSlide1" name="innovation_cbc_slides">
+                            <label class="form-check-label" for="innovationSlide1">Innovation ranking</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Innovation potential" id="innovationSlide2" name="innovation_cbc_slides">
+                            <label class="form-check-label" for="innovationSlide2">Innovation potential</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Innovation sourcing" id="innovationSlide3" name="innovation_cbc_slides">
+                            <label class="form-check-label" for="innovationSlide3">Innovation sourcing</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ppaChecklist" class="form-section slide-down" style="display: none;">
+                    <div class="checklist-container">
+                        <div class="checklist-title">
+                            <i class="fas fa-tasks me-2"></i>
+                            Select PPA slides to generate:
+                        </div>
+                        
+                        <div class="form-check select-all-section">
+                            <input class="form-check-input" type="checkbox" id="selectAllPPA" onchange="toggleAllSlides(this, 'ppa_slides')">
+                            <label class="form-check-label" for="selectAllPPA">
+                                <strong><i class="fas fa-check-double me-2"></i>Select All</strong>
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Value Vs AvgPrice By" id="ppaSlide1" name="ppa_slides">
+                            <label class="form-check-label" for="ppaSlide1">Value Vs AvgPrice By</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Brackets By Category" id="ppaSlide2" name="ppa_slides">
+                            <label class="form-check-label" for="ppaSlide2">Brackets By Category</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Brackets By Retailer By Category" id="ppaSlide3" name="ppa_slides">
+                            <label class="form-check-label" for="ppaSlide3">Brackets By Retailer By Category</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Brackets By Channel By Category" id="ppaSlide4" name="ppa_slides">
+                            <label class="form-check-label" for="ppaSlide4">Brackets By Channel By Category</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Brackets by Custom Areas" id="ppaSlide5" name="ppa_slides">
+                            <label class="form-check-label" for="ppaSlide5">Brackets by Custom Areas</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Brackets By Sector" id="ppaSlide6" name="ppa_slides">
+                            <label class="form-check-label" for="ppaSlide6">Brackets By Sector</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Brackets By ParentxSegment" id="ppaSlide7" name="ppa_slides">
+                            <label class="form-check-label" for="ppaSlide7">Brackets By ParentxSegment</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Inter-size Discount" id="ppaSlide8" name="ppa_slides">
+                            <label class="form-check-label" for="ppaSlide8">Inter-size Discount</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Landscape Checklist -->
+                <div id="landscapeChecklist" class="form-section slide-down" style="display: none;">
+                    <div class="checklist-container">
+                        <div class="checklist-title">
+                            <i class="fas fa-tasks me-2"></i>
+                            Select Landscape slides to generate:
+                        </div>
+                        
+                        <div class="form-check select-all-section">
+                            <input class="form-check-input" type="checkbox" id="selectAllLandscapes" onchange="toggleAllSlides(this, 'landscape_slides')">
+                            <label class="form-check-label" for="selectAllLandscapes">
+                                <strong><i class="fas fa-check-double me-2"></i>Select All</strong>
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Market Trends by Brands" id="landscapeSlide1" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide1">Market Trends by Brands</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Market Trends by Sectors" id="landscapeSlide2" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide2">Market Trends by Sectors</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Market Trends by Segments" id="landscapeSlide2" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide2">Market Trends by Segments</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Market Trends by SubSegments" id="landscapeSlide2" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide2">Market Trends by SubSegments</label>
+                        </div>
+                        <div class="form-check"> 
+                            <input class="form-check-input" type="checkbox" value="Market Trends By SubCategory" id="landscapeSlide2" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide2">Market Trends By SubCategory</label>
+                        </div>
+                        <div class="form-check"> 
+                            <input class="form-check-input" type="checkbox" value="Market Trends By Manufacturer" id="landscapeSlide2" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide2">Market Trends By Manufacturer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Market Concentration By Brands" id="landscapeSlide2" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide2">Market Concentration By Brands</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Market Concentration By Sector" id="landscapeSlide2" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide2">Market Concentration By Sector</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Market Concentration By Segments" id="landscapeSlide2" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide2">Market Concentration By Segments</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Market Concentration By SubSegments" id="landscapeSlide2" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide2">Market Concentration By SubSegments</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Market Concentration By SubCategory" id="landscapeSlide2" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide2">Market Concentration By SubCategory</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Market Concentration By Manufacturer" id="landscapeSlide2" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide2">Market Concentration By Manufacturer</label>
+                        </div>
+                        <!-- <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Market Growth By" id="landscapeSlide3" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide3">Market Growth By</label>
+                        </div> -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Value Vs AvgPrice By Sectors" id="landscapeSlide4" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide4">Value Vs AvgPrice By Sectors</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Value Vs AvgPrice By Segments" id="landscapeSlide4" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide4">Value Vs AvgPrice By Segments</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Value Vs AvgPrice By SubSegments" id="landscapeSlide4" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide4">Value Vs AvgPrice By SubSegments</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Value Vs AvgPrice By SubCategory" id="landscapeSlide4" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide4">Value Vs AvgPrice By SubCategory</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Value Vs AvgPrice By Retailer For Channel" id="landscapeSlide4" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide4">Value Vs AvgPrice By Retailer For Channel</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Value Vs AvgPrice By Channel For Region" id="landscapeSlide4" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide4">Value Vs AvgPrice By Channel For Region</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Share and Growth By Manufacturer/Brands" id="landscapeSlide5" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide5">Share and Growth By Manufacturer/Brands</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Share And Growth By Manufacturer By Retailer" id="landscapeSlide6" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide6">Share And Growth By Manufacturer By Retailer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Share And Growth By Manufacturer By" id="landscapeSlide7" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide7">Share And Growth By Manufacturer By</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Category Trends" id="landscapeSlide8" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide8">Category Trends/label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Share Evolution By Manuf" id="landscapeSlide9" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide9">Share Evolution By Manuf</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Share Evolution By Brand" id="landscapeSlide10" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide10">Share Evolution By Brand</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Category Overview" id="landscapeSlide11" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide11">Category Overview</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sales and Growth By Sector" id="landscapeSlide12" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide12">Sales and Growth By Sector</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sales and Growth By Segment" id="landscapeSlide12" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide12">Sales and Growth By Segment</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sales and Growth By SubSegment" id="landscapeSlide12" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide12">Sales and Growth By SubSegment</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sales and Growth By SubCategories" id="landscapeSlide12" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide12">Sales and Growth By SubCategories</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sales and Growth By Category for Channel For Retailer" id="landscapeSlide12" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide12">Sales and Growth By Category for Channel For Retailer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sales and Growth By Category for Region For Channel" id="landscapeSlide12" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide12">Sales and Growth By Category for Region For Channel</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sales and Growth By Sector for Channel For Retailer" id="landscapeSlide12" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide12">Sales and Growth By Sector for Channel For Retailer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sales and Growth By Sector for Region For Channel" id="landscapeSlide12" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide12">Sales and Growth By Sector for Region For Channel</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sales and Growth By Segment for Channel For Retailer" id="landscapeSlide12" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide12">Sales and Growth By Segment for Channel For Retailer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sales and Growth By Segment for Region For Channel" id="landscapeSlide12" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide12">Sales and Growth By Segment for Region For Channel</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sales and Growth By SubSegment for Channel For Retailer" id="landscapeSlide12" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide12">Sales and Growth By SubSegment for Channel For Retailer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sales and Growth By SubSegment for Region For Channel" id="landscapeSlide12" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide12">Sales and Growth By SubSegment for Region For Channel</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sales and Growth By SubCategory for Channel For Retailer" id="landscapeSlide12" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide12">Sales and Growth By SubCategory for Channel For Retailer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sales and Growth By SubCategory for Region For Channel" id="landscapeSlide12" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide12">Sales and Growth By SubCategory for Region For Channel</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Momentum Analysis By Retailers" id="landscapeSlide13" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide13">Momentum Analysis By Retailers</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Momentum Analysis By Channels" id="landscapeSlide13" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide13">Momentum Analysis By Channels</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Momentum Analysis By customarea" id="landscapeSlide13" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide13">Momentum Analysis By customarea</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Momentum Analysis By Retailers By Segments" id="landscapeSlide13" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide13">Momentum Analysis By Retailers By Segments</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Momentum Analysis By Retailers By SubSegments" id="landscapeSlide13" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide13">Momentum Analysis By Retailers By SubSegments</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Momentum Analysis By Retailers By SubCategories" id="landscapeSlide13" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide13">Momentum Analysis By Retailers By SubCategories</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Momentum Analysis By Channels By Segments" id="landscapeSlide13" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide13">Momentum Analysis By Channels By Segments</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Momentum Analysis By Channels By SubSegments" id="landscapeSlide13" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide13">Momentum Analysis By Channels By SubSegments</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Momentum Analysis By Channels By SubCategories" id="landscapeSlide13" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide13">Momentum Analysis By Channels By SubCategories</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Momentum Analysis By customarea By Segments" id="landscapeSlide13" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide13">Momentum Analysis By customarea By Segments</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Momentum Analysis By customarea By SubSegments" id="landscapeSlide13" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide13">Momentum Analysis By customarea By SubSegments</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Momentum Analysis By customarea By SubCategories" id="landscapeSlide13" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide13">Momentum Analysis By customarea By SubCategories</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Revenue PVM By Manufacturer" id="landscapeSlide13" name="landscape_slides">
+                            <label class="form-check-label" for="landscapeSlide13">Revenue PVM By Manufacturer</label>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="assortmentChecklist" class="form-section slide-down" style="display: none;">
+                    <div class="checklist-container">
+                        <div class="checklist-title">
+                            <i class="fas fa-tasks me-2"></i>
+                            Select Assortment slides to generate:
+                        </div>
+                        
+                        <div class="form-check select-all-section">
+                            <input class="form-check-input" type="checkbox" id="selectAllAssortment" onchange="toggleAllSlides(this, 'assortment_slides')">
+                            <label class="form-check-label" for="selectAllAssortment">
+                                <strong><i class="fas fa-check-double me-2"></i>Select All</strong>
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SKU Share By Brand" id="assortmentSlide1" name="assortment_slides">
+                            <label class="form-check-label" for="assortmentSlide1">SKU Share By Brand</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SKU Share by Manuf" id="assortmentSlide2" name="assortment_slides">
+                            <label class="form-check-label" for="assortmentSlide2">SKU Share by Manuf</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Cumulative Product Share" id="assortmentSlide3" name="assortment_slides">
+                            <label class="form-check-label" for="assortmentSlide3">Cumulative Product Share</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Top 50% cumulative share" id="assortmentSlide4" name="assortment_slides">
+                            <label class="form-check-label" for="assortmentSlide4">Top 50% cumulative share</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Brand Cumulative Product Share" id="assortmentSlide5" name="assortment_slides">
+                            <label class="form-check-label" for="assortmentSlide5">Brand Cumulative Product Share</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Top 20 cumulative share" id="assortmentSlide6" name="assortment_slides">
+                            <label class="form-check-label" for="assortmentSlide6">Top 20 cumulative share</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SKU Productivity Analysis with TM%" id="assortmentSlide7" name="assortment_slides">
+                            <label class="form-check-label" for="assortmentSlide7">SKU Productivity Analysis with TM%</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SKU Productivity Analysis with WD" id="assortmentSlide8" name="assortment_slides">
+                            <label class="form-check-label" for="assortmentSlide8">SKU Productivity Analysis with WD</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Fair Share" id="assortmentSlide9" name="assortment_slides">
+                            <label class="form-check-label" for="assortmentSlide9">Fair Share</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SKU Share By Brand with no client" id="assortmentSlide10" name="assortment_slides">
+                            <label class="form-check-label" for="assortmentSlide10">SKU Share By Brand with no client</label>
+                        </div>
+                    
+                    
+                    </div>
+                </div>
+
+                <div id="financialsChecklist" class="form-section slide-down" style="display: none;">
+                    <div class="checklist-container">
+                        <div class="checklist-title">
+                            <i class="fas fa-tasks me-2"></i>
+                            Select Financials slides to generate:
+                        </div>
+                        <div class="form-check select-all-section">
+                            <input class="form-check-input" type="checkbox" id="selectAllFinancials" onchange="toggleAllSlides(this, 'financials_slides')">
+                            <label class="form-check-label" for="selectAllFinancials">
+                                <strong><i class="fas fa-check-double me-2"></i>Select All</strong>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by brand" id="financialsSlide1" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide1">Mix Analysis by brand</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by Retailer for Region" id="financialsSlide2" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide2">Mix Analysis by Retailer for Region</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by Retailer for Channel" id="financialsSlide2" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide2">Mix Analysis by Retailer for Channel</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by Retailer for Market" id="financialsSlide2" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide2">Mix Analysis by Retailer for Market</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by Channel for Region" id="financialsSlide2" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide2">Mix Analysis by Channel for Region</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by Channel for Channel" id="financialsSlide2" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide2">Mix Analysis by Channel for Channel</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by Channel for Market" id="financialsSlide2" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide2">Mix Analysis by Channel for Market</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by customarea for Region" id="financialsSlide2" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide2">Mix Analysis by customarea for Region</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by customarea for Channel" id="financialsSlide2" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide2">Mix Analysis by customarea for Channel</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by customarea for Market" id="financialsSlide2" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide2">Mix Analysis by customarea for Market</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by Sector" id="financialsSlide3" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide3">Mix Analysis by Sector</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by Segment" id="financialsSlide3" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide3">Mix Analysis by Segment</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by Subsegment" id="financialsSlide3" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide3">Mix Analysis by Subsegment</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by Subcategory" id="financialsSlide3" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide3">Mix Analysis by Subcategory</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Analysis by {prodORitem}" id="financialsSlide3" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide3">Mix Analysis by {prodORitem}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Trade Margin Analysis by Sector" id="financialsSlide4" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide4">Trade Margin Analysis by Sector</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Trade Margin Analysis by Segment" id="financialsSlide4" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide4">Trade Margin Analysis by Segment</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Trade Margin Analysis by Subsegment" id="financialsSlide4" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide4">Trade Margin Analysis by Subsegment</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Trade Margin Analysis by Subcategory" id="financialsSlide4" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide4">Trade Margin Analysis by Subcategory</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sector KPI" id="financialsSlide5" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide5">Sector KPI</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SKU KPIs Summary By Manufacture" id="financialsSlide6" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide6">SKU KPIs Summary By Manufacture</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SKU KPIs Summary By Brand" id="financialsSlide6" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide6">SKU KPIs Summary By Brand</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Matrix By Retailer" id="financialsSlide7" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide7">Mix Matrix By Retailer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Matrix By Channel" id="financialsSlide7" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide7">Mix Matrix By Channel</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Matrix By Channel" id="financialsSlide7" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide7">Mix Matrix By Channelr</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Matrix By Brands By Sector" id="financialsSlide8" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide8">Mix Matrix By Brands By Sector</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Matrix By Brands By Segment" id="financialsSlide8" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide8">Mix Matrix By Brands By Segment</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Matrix By Brands By Subsegment" id="financialsSlide8" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide8">Mix Matrix By Brands By Subsegment</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Mix Matrix By Brands By Subcategory" id="financialsSlide8" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide8">Mix Matrix By Brands By Subcategory</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sector Spending Pool" id="financialsSlide9" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide9">Sector Spending Pool</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Segment Spending Pool" id="financialsSlide9" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide9">Segment Spending Pool</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Subsegment Spending Pool" id="financialsSlide9" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide9">Subsegment Spending Pool</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Subcategory Spending Pool" id="financialsSlide9" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide9">Subcategory Spending Pool</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Product Spending Pool" id="financialsSlide10" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide10">Product Spending Pool</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SKU Profitability" id="financialsSlide11" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide11">SKU Profitability</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Trade Margin Table By Sector" id="financialsSlide12" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide12">Trade Margin Table By Sector</label>
+                        </div>
+                        
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Trade Margin Table By Segment" id="financialsSlide12" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide12">Trade Margin Table By Segment</label>
+                        </div>
+                        
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Trade Margin Table By Subsegment" id="financialsSlide12" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide12">Trade Margin Table By Subsegment</label>
+                        </div>
+                        
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Trade Margin Table By Subcategory" id="financialsSlide12" name="financials_slides">
+                            <label class="form-check-label" for="financialsSlide12">Trade Margin Table By Subcategory</label>
+                        </div>
+                    </div>
+                </div> 
+               
+                <div id="pricingChecklist" class="form-section slide-down" style="display: none;">
+                    <div class="checklist-container">
+                        <div class="checklist-title">
+                            <i class="fas fa-tasks me-2"></i>
+                            Select Pricing slides to generate:
+                        </div>
+                        
+                        <div class="form-check select-all-section">
+                            <input class="form-check-input" type="checkbox" id="selectAllPricingCbc" onchange="toggleAllSlides(this, 'pricing_slides')">
+                            <label class="form-check-label" for="selectAllPricingCbc">
+                                <strong><i class="fas fa-check-double me-2"></i>Select All</strong>
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Positioning Summary Category" id="pricingSlide1" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide1">Price Positioning Summary Category</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Positioning Summary Sector" id="pricingSlide1" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide1">Price Positioning Summary Sector</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Positioning Summary Segment" id="pricingSlide1" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide1">Price Positioning Summary Segment</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Positioning Summary SubSegment" id="pricingSlide1" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide1">Price Positioning Summary SubSegment</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Positioning Summary SubCategory" id="pricingSlide1" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide1">Price Positioning Summary Subcategory</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Positioning Analysis By Brand" id="pricingSlide2" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide2">Price Positioning Analysis By Brand</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Positioning Analysis By Manufacturer" id="pricingSlide2" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide2">Price Positioning Analysis By Manufacturer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sector Share and Growth By Brands" id="pricingSlide3" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide3">Sector Share and Growth By Brands</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Segment Share and Growth By Brands" id="pricingSlide3" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide3">Segment Share and Growth By Brands</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SubSegment Share and Growth By Brands" id="pricingSlide3" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide3">SubSegment Share and Growth By Brands</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SubCategory Share and Growth By Brands" id="pricingSlide3" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide3">SubCategory Share and Growth By Brands</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sector Share and Growth By Manufacturer" id="pricingSlide4" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide4">Sector Share and Growth By Manufacturer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Segment Share and Growth By Manufacturer" id="pricingSlide4" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide4">Segment Share and Growth By Manufacturer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SubSegment Share and Growth By Manufacturer" id="pricingSlide4" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide4">SubSegment Share and Growth By Manufacturer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SubCategory Share and Growth By Manufacturer" id="pricingSlide4" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide4">SubCategory Share and Growth By Manufacturer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sec/Seg Value Sales Vs Avg Price By Manufacturer" id="pricingSlide5" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide5">Sec/Seg Value Sales Vs Avg Price By Manufacturer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sector Sales Vs Avg Price" id="pricingSlide6" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide6">Sector Value Sales Vs Avg Price</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Segment Sales Vs Avg Price" id="pricingSlide6" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide6">Segment Value Sales Vs Avg Price</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SubSegment Sales Vs Avg Price" id="pricingSlide6" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide6">SubSegment Value Sales Vs Avg Price</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SubCategory Sales Vs Avg Price" id="pricingSlide6" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide6">SubCategory Value Sales Vs Avg Price</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Avg Price/Vol Comparison" id="pricingSlide7" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide7">Avg Price/Vol Comparison</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Shelf Price/Vol Comparison" id="pricingSlide8" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide8">Shelf Price/Vol Comparison</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Category Price Point Distribution Analysis P3M" id="pricingSlide9" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide9">Category Price Point Distribution Analysis P3M</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sector Price Point Distribution Analysis P3M" id="pricingSlide9" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide9">Sector Price Point Distribution Analysis P3M</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Segment Price Point Distribution Analysis P3M" id="pricingSlide9" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide9">Segment Price Point Distribution Analysis P3M</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Category Point Distribution Analysis P12M" id="pricingSlide10" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide10">Category Price Point Distribution Analysis P12M</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Sector Point Distribution Analysis P12M" id="pricingSlide10" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide10">Sector Price Point Distribution Analysis P12M</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Segment Point Distribution Analysis P12M" id="pricingSlide10" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide10">Segment Price Point Distribution Analysis P12M</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Point Distribution Analysis P3M ByManuf" id="pricingSlide11" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide11">Price Point Distribution Analysis P3M ByManuf</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Point Distribution Analysis P12M ByManuf" id="pricingSlide12" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide12">Price Point Distribution Analysis P12M ByManuf</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Point Distribution Scraped" id="pricingSlide13" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide13">Price Point Distribution Scraped</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Point Distribution Scraped ByManuf" id="pricingSlide14" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide14">Price Point Distribution Scraped ByManuf</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Point Comparison Analysis by Manuf" id="pricingSlide15" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide15">Price Point Comparison Analysis by Manuf</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Point Comparison Analysis" id="pricingSlide16" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide16">Price Point Comparison Analysis</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Point Comparison Analysis by Product Scraped" id="pricingSlide17" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide17">Price Point Comparison Analysis by Product Scraped</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Point Comparison Analysis by Manuf Scraped" id="pricingSlide18" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide18">Price Point Comparison Analysis by Manuf Scraped</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Point Distribution Analysis By Brand" id="pricingSlide19" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide19">Price Point Distribution Analysis By Brand</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Price Point Distribution Analysis By Brand By" id="pricingSlide20" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide20">Price Point Distribution Analysis By Brand By</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Category Price Correlation Analysis P3Y" id="pricingSlide21" name="pricing_slides">
+                            <label class="form-check-label" for="pricingSlide21">Category Price Correlation Analysis P3Y</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="promotionChecklist" class="form-section slide-down" style="display: none;">
+                    <div class="checklist-container">
+                        <div class="checklist-title">
+                            <i class="fas fa-tasks me-2"></i>
+                            Select slides to generate:
+                        </div>
+                        
+                        <div class="form-check select-all-section">
+                            <input class="form-check-input" type="checkbox" id="selectAll" onchange="toggleAllSlides(this, 'promotion_slides')">
+                            <label class="form-check-label" for="selectAll">
+                                <strong><i class="fas fa-check-double me-2"></i>Select All</strong>
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="PromoEvolution" id="slide1" name="promotion_slides">
+                            <label class="form-check-label" for="slide1">Promo Evolution</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="VSODSummarybySector" id="slide2" name="promotion_slides">
+                            <label class="form-check-label" for="slide2">VSOD Summary by Sector</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="ValueUpliftbyretailerbybrand" id="slide3" name="promotion_slides">
+                            <label class="form-check-label" for="slide3">Value uplift by retailer by brand</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="VolumeUpliftvsdiscountdepth" id="slide4" name="promotion_slides">
+                            <label class="form-check-label" for="slide4">Volume Uplift vs discount depth</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="ValueUpliftvsPromoEfficiencyQuadrant" id="slide5" name="promotion_slides">
+                            <label class="form-check-label" for="slide5">Value Uplift vs Promo Efficiency Quadrant</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Top 20 promotions" id="slide6" name="promotion_slides">
+                            <label class="form-check-label" for="slide6">Top 20 promotions</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Top 20 promotions CLIENT ONLY" id="slide7" name="promotion_slides">
+                            <label class="form-check-label" for="slide7">Top 20 promotions CLIENT ONLY</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Bottom 20 promotions CLIENT ONLY" id="slide8" name="promotion_slides">
+                            <label class="form-check-label" for="slide8">Bottom 20 promotions CLIENT ONLY</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Volume Sold on Deal" id="slide9" name="promotion_slides">
+                            <label class="form-check-label" for="slide9">Volume Sold on Deal</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Promo share vs Value Share" id="slide10" name="promotion_slides">
+                            <label class="form-check-label" for="slide10">Promo share vs Value Share</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Promo Sales by total size" id="slide11" name="promotion_slides">
+                            <label class="form-check-label" for="slide11">Promo Sales by total size</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Promo Sales by promo type" id="slide12" name="promotion_slides">
+                            <label class="form-check-label" for="slide12">Promo Sales by promo type</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Feature Share vs Fair Share" id="slide13" name="promotion_slides">
+                            <label class="form-check-label" for="slide13">Feature Share vs Fair Share</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Display Share vs Fair Share" id="slide14" name="promotion_slides">
+                            <label class="form-check-label" for="slide14">Display Share vs Fair Share</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Promo Frequency learnings" id="slide15" name="promotion_slides">
+                            <label class="form-check-label" for="slide15">Promo Frequency learnings</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Promo sales per retailer" id="slide16" name="promotion_slides">
+                            <label class="form-check-label" for="slide16">Promo sales per retailer</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value='Value uplift vs discount depth' id="slide17" name="promotion_slides">
+                            <label class="form-check-label" for="slide17">Value uplift vs discount depth</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Seasonality Index" id="slide18" name="promotion_slides">
+                            <label class="form-check-label" for="slide18">Seasonality Index</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Promotional Frequency Analysis" id="slide19" name="promotion_slides">
+                            <label class="form-check-label" for="slide19">Promotional Frequency Analysis</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Promo Evolution no client prio" id="slide20" name="promotion_slides">
+                            <label class="form-check-label" for="slide20">Promo Evolution no client prio</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="VSOD Summary by Sector no client prio" id="slide21" name="promotion_slides">
+                            <label class="form-check-label" for="slide21">VSOD Summary by Sector no client prio</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Value uplift by retailer by brand no client prio" id="slide22" name="promotion_slides">
+                            <label class="form-check-label" for="slide22">Value uplift by retailer by brand no client prio</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Promo share vs Value Share no client prio" id="slide23" name="promotion_slides">
+                            <label class="form-check-label" for="slide23">Promo share vs Value Share no client prio</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Promo Sales by total size no client prio" id="slide24" name="promotion_slides">
+                            <label class="form-check-label" for="slide24">Promo Sales by total size no client prio</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Promo Sales by promo type no client prio" id="slide25" name="promotion_slides">
+                            <label class="form-check-label" for="slide25">Promo Sales by promo type no client prio</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Feature Share vs Fair Share no client prio" id="slide26" name="promotion_slides">
+                            <label class="form-check-label" for="slide26">Feature Share vs Fair Share no client prio</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="Display Share vs Fair Share no client prio" id="slide27" name="promotion_slides">
+                            <label class="form-check-label" for="slide27">Display Share vs Fair Share no client prio</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sectionParams" class="form-section slide-down" style="display: none;">
+                    <label for="section" class="form-label">
+                        <i class="fas fa-cog"></i>
+                        What do you want to do?
+                    </label>
+                    {{ form.section(class="form-select", id="section") }}
+                </div>
+
+                <div class="text-center" id="submitDiv" style="display: none;">
+                    {{ form.submit(class="btn btn-primary btn-lg", id="submitButton") }}
+                </div>
+            </form>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="mt-4">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' }} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showLoading() {
+            document.getElementById("loadingOverlay").style.display = "flex";
+        }
+
+        function hideLoading() {
+            document.getElementById("loadingOverlay").style.display = "none";
+        }
+
+        function updateProgress(step) {
+            const steps = document.querySelectorAll('.progress-step');
+            const lines = document.querySelectorAll('.progress-line');
+            
+            steps.forEach((s, index) => {
+                if (index < step) {
+                    s.classList.add('active');
+                } else {
+                    s.classList.remove('active');
+                }
+            });
+            
+            lines.forEach((line, index) => {
+                if (index < step - 1) {
+                    line.classList.add('active');
+                } else {
+                    line.classList.remove('active');
+                }
+            });
+        }
+
+        function showDropdown(fileInput) {
+            const dropdownDiv = document.getElementById('dropdownDiv');
+            if (fileInput.value) {
+                dropdownDiv.style.display = 'block';
+                updateProgress(2);
+            } else {
+                dropdownDiv.style.display = 'none';
+                document.getElementById('sectionParams').style.display = 'none';
+                document.getElementById('submitDiv').style.display = 'none';
+                document.getElementById('promotionChecklist').style.display = 'none';
+                updateProgress(1);
+            }
+        }
+
+        function showParams(select) {
+            const submitDiv = document.getElementById('submitDiv');
+            const sectionParams = document.getElementById('sectionParams');
+            const promotionChecklist = document.getElementById('promotionChecklist');
+            const pricingCbcDiv = document.getElementById('pricingCbcDiv'); // NEW
+            const innovationCbcDiv = document.getElementById('innovationCbcDiv');
+            const pricingCbcChecklist = document.getElementById('pricingCbcChecklist');
+            const innovationCbcChecklist = document.getElementById('innovationCbcChecklist');
+            const financialsChecklist = document.getElementById('financialsChecklist');
+            const assortmentChecklist = document.getElementById('assortmentChecklist');
+            const pricingChecklist = document.getElementById('pricingChecklist');
+            const landscapeChecklist = document.getElementById('landscapeChecklist');
+            const ppaChecklist = document.getElementById('ppaChecklist');
+
+            
+            if (['Pricing CBC', 'Innovation CBC', 'Assortment', 'PPA', 'Financials', 'Pricing','Landscape','Promotion'].includes(select.value)) {
+                sectionParams.style.display = 'block';
+                submitDiv.style.display = 'block';
+                updateProgress(3);
+                // innovationCbcDiv.style.display = (select.value === 'Innovation CBC') ? 'block' : 'none';
+
+
+                if (select.value === 'Promotion') {
+                    promotionChecklist.style.display = 'block';
+                } else {
+                    promotionChecklist.style.display = 'none';
+                }
+
+                if (select.value === 'Assortment') {
+                    assortmentChecklist.style.display = 'block';
+                } else {
+                    assortmentChecklist.style.display = 'none';
+                }
+
+                if (select.value === 'Financials') {
+                    financialsChecklist.style.display = 'block';
+                } else {
+                    financialsChecklist.style.display = 'none';
+                }
+
+                if (select.value === 'Pricing') {
+                    pricingChecklist.style.display = 'block';
+                } else {
+                    pricingChecklist.style.display = 'none';
+                }
+
+                if (select.value === 'Landscape') {
+                    landscapeChecklist.style.display = 'block';
+                } else {
+                    landscapeChecklist.style.display = 'none';
+                }
+
+                if (select.value === 'PPA') {
+                    ppaChecklist.style.display = 'block';
+                } else {
+                    ppaChecklist.style.display = 'none';
+                }
+
+                if (select.value === 'Pricing CBC') {
+                    pricingCbcDiv.style.display = 'block';
+                
+                    pricingCbcChecklist.style.display = 'block';
+                } else {
+                    pricingCbcDiv.style.display = 'none';
+                    pricingCbcChecklist.style.display = 'none';
+                }
+
+                if (select.value === 'Innovation CBC') {
+                    innovationCbcDiv.style.display = 'block';
+                    innovationCbcChecklist.style.display = 'block';
+                } else {
+                    innovationCbcDiv.style.display = 'none';
+                    innovationCbcChecklist.style.display = 'none';
+                }
+
+                
+                
+            } else {
+                sectionParams.style.display = 'none';
+                submitDiv.style.display = 'none';
+                pricingCbcDiv.style.display = 'none';
+                innovationCbcDiv.style.display = 'none';
+                promotionChecklist.style.display = 'none';
+                assortmentChecklist.style.display = 'none';
+                innovationCbcChecklist.style.display = 'none';
+                pricingCbcChecklist.style.display = 'none';
+                financialsChecklist.style.display = 'none';
+                pricingChecklist.style.display = 'none';
+                landscapeChecklist.style.display = 'none';
+                ppaChecklist.style.display = 'none';
+                updateProgress(2);
+            }
+        }
+
+        // function toggleAllSlides(selectAllCheckbox) {
+        //     const checkboxes = document.querySelectorAll('input[name="promotion_slides"]');
+        //     checkboxes.forEach(function(checkbox) {
+        //         checkbox.checked = selectAllCheckbox.checked;
+        //     });
+        // }
+        function toggleAllSlides(selectAllCheckbox, slideName = 'promotion_slides') {
+            const checkboxes = document.querySelectorAll(`input[name="${slideName}"]`);
+            checkboxes.forEach(function(checkbox) {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }
+
+        function validateForm() {
+            const dropdown = document.getElementById('dropdown');
+            if (dropdown.value === 'Choose...' || dropdown.value === '') {
+                alert('Please select a valid section.');
+                return false;
+            }
+            return true;
+        }
+        
+        document.getElementById('uploadForm').addEventListener('submit', function (e) {
+            const isValid = validateForm();
+            if (isValid) {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const promotionSlideCheckboxes = document.querySelectorAll('input[name="promotion_slides"]');
+            const selectAllCheckbox = document.getElementById('selectAll');
+            
+            promotionSlideCheckboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    const checkedCount = document.querySelectorAll('input[name="promotion_slides"]:checked').length;
+                    selectAllCheckbox.checked = checkedCount === promotionSlideCheckboxes.length;
+                    selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < promotionSlideCheckboxes.length;
+                });
+            });
+
+            const assortmentSlideCheckboxes = document.querySelectorAll('input[name="assortment_slides"]');
+            const selectAllAssortmentCheckbox = document.getElementById('selectAllAssortment');
+            
+            assortmentSlideCheckboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    const checkedCount = document.querySelectorAll('input[name="assortment_slides"]:checked').length;
+                    selectAllAssortmentCheckbox.checked = checkedCount === assortmentSlideCheckboxes.length;
+                    selectAllAssortmentCheckbox.indeterminate = checkedCount > 0 && checkedCount < assortmentSlideCheckboxes.length;
+                });
+            });
+
+            // Handle pricing CBC slides
+            const pricingCbcSlideCheckboxes = document.querySelectorAll('input[name="pricing_cbc_slides"]');
+            const selectAllPricingCbcCheckbox = document.getElementById('selectAllPricingCbc');
+
+            pricingCbcSlideCheckboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    const checkedCount = document.querySelectorAll('input[name="pricing_cbc_slides"]:checked').length;
+                    selectAllPricingCbcCheckbox.checked = checkedCount === pricingCbcSlideCheckboxes.length;
+                    selectAllPricingCbcCheckbox.indeterminate = checkedCount > 0 && checkedCount < pricingCbcSlideCheckboxes.length;
+                });
+            });
+
+            // Handle innovation CBC slides
+            const innovationCbcSlideCheckboxes = document.querySelectorAll('input[name="innovation_cbc_slides"]');
+            const selectAllInnovationCbcCheckbox = document.getElementById('selectAllInnovationCbc');
+
+            innovationCbcSlideCheckboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    const checkedCount = document.querySelectorAll('input[name="innovation_cbc_slides"]:checked').length;
+                    selectAllInnovationCbcCheckbox.checked = checkedCount === innovationCbcSlideCheckboxes.length;
+                    selectAllInnovationCbcCheckbox.indeterminate = checkedCount > 0 && checkedCount < innovationCbcSlideCheckboxes.length;
+                });
+            });
+
+            // Handle financials slides
+            const financialsSlideCheckboxes = document.querySelectorAll('input[name="financials_slides"]');
+            const selectAllFinancialsCheckbox = document.getElementById('selectAllFinancials');
+
+            financialsSlideCheckboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    const checkedCount = document.querySelectorAll('input[name="financials_slides"]:checked').length;
+                    selectAllFinancialsCheckbox.checked = checkedCount === financialsSlideCheckboxes.length;
+                    selectAllFinancialsCheckbox.indeterminate = checkedCount > 0 && checkedCount < financialsSlideCheckboxes.length;
+                });
+            });
+
+            // Handle Pricing slides
+            const PricingSlideCheckboxes = document.querySelectorAll('input[name="pricing_slides"]');
+            const selectAllPricingsCheckbox = document.getElementById('selectAllPricings');
+
+            PricingSlideCheckboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    const checkedCount = document.querySelectorAll('input[name="pricing_slides"]:checked').length;
+                    selectAllPricingsCheckbox.checked = checkedCount === PricingSlideCheckboxes.length;
+                    selectAllPricingsCheckbox.indeterminate = checkedCount > 0 && checkedCount < PricingSlideCheckboxes.length;
+                });
+            });
+
+            // Handle Landscape slides
+            const landscapeSlideCheckboxes = document.querySelectorAll('input[name="landscape_slides"]');
+            const selectAllLandscapesCheckbox = document.getElementById('selectAllLandscapes');
+
+            landscapeSlideCheckboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    const checkedCount = document.querySelectorAll('input[name="landscape_slides"]:checked').length;
+                    selectAllLandscapesCheckbox.checked = checkedCount === landscapeSlideCheckboxes.length;
+                    selectAllLandscapesCheckbox.indeterminate = checkedCount > 0 && checkedCount < landscapeSlideCheckboxes.length;
+                });
+            });
+
+            // Handle PPA slides
+            const ppaSlideCheckboxes = document.querySelectorAll('input[name="ppa_slides"]');
+            const selectAllPpaCheckbox = document.getElementById('selectAllPPA');
+
+            ppaSlideCheckboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    const checkedCount = document.querySelectorAll('input[name="ppa_slides"]:checked').length;
+                    selectAllPpaCheckbox.checked = checkedCount === ppaSlideCheckboxes.length;
+                    selectAllPpaCheckbox.indeterminate = checkedCount > 0 && checkedCount < ppaSlideCheckboxes.length;
+                });
+            });
+
+            // Initialize progress
+            updateProgress(1);
+        });
+        // Slide Preview Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Define slide preview images
+            const slideImages = { 
+                "Market Trends by Brands": "/static/Landscape Images/Slide1.png",
+                "Market Trends by Sectors": "/static/Landscape Images/Slide1.png",
+                "Market Trends by Segments": "/static/Landscape Images/Slide1.png",
+                "Market Trends by SubSegments": "/static/Landscape Images/Slide1.png",
+                "Market Trends By SubCategory": "/static/Landscape Images/Slide1.png",
+                "Market Trends By Manufacturer": "/static/Landscape Images/Slide1.png",
+                "Market Concentration By Brands": "/static/Landscape Images/Slide2.png",
+                "Market Concentration By Sector": "/static/Landscape Images/Slide2.png",
+                "Market Concentration By Segments": "/static/Landscape Images/Slide2.png",
+                "Market Concentration By SubSegments": "/static/Landscape Images/Slide2.png",
+                "Market Concentration By SubCategory": "/static/Landscape Images/Slide2.png",
+                "Market Concentration By Manufacturer": "/static/Landscape Images/Slide2.png",
+                "Value Vs AvgPrice By Sectors": "/static/Landscape Images/Slide4.png",
+                "Value Vs AvgPrice By Segments": "/static/Landscape Images/Slide4.png",
+                "Value Vs AvgPrice By SubSegments": "/static/Landscape Images/Slide4.png",
+                "Value Vs AvgPrice By SubCategory": "/static/Landscape Images/Slide4.png",
+                "Value Vs AvgPrice By Retailer For Channel": "/static/Landscape Images/Slide4.png",
+                "Value Vs AvgPrice By Channel For Region": "/static/Landscape Images/Slide4.png",
+                "Share and Growth By Manufacturer/Brands": "/static/Landscape Images/Slide5.png",
+                "Share And Growth By Manufacturer By Retailer": "/static/Landscape Images/Slide5.png",
+                "Share And Growth By Manufacturer By": "/static/Landscape Images/Slide5.png",
+                "Category Trends": "/static/Landscape Images/Slide8.png",
+                "Share Evolution By Manuf": "/static/Landscape Images/Slide9.png",
+                "Share Evolution By Brand": "/static/Landscape Images/Slide9.png",
+                "Category Overview": "/static/Landscape Images/Slide10.png",
+                "Sales and Growth By Sector": "/static/Landscape Images/Slide12.png",
+                "Sales and Growth By Segment": "/static/Landscape Images/Slide12.png",
+                "Sales and Growth By SubSegment": "/static/Landscape Images/Slide12.png",
+                "Sales and Growth By SubCategories": "/static/Landscape Images/Slide12.png",
+                "Sales and Growth By Category for Channel For Retailer": "/static/Landscape Images/Slide12.png",
+                "Sales and Growth By Category for Region For Channel": "/static/Landscape Images/Slide12.png",
+                "Sales and Growth By Sector for Channel For Retailer": "/static/Landscape Images/Slide12.png",
+                "Sales and Growth By Sector for Region For Channel": "/static/Landscape Images/Slide12.png",
+                "Sales and Growth By Segment for Channel For Retailer": "/static/Landscape Images/Slide12.png",
+                "Sales and Growth By Segment for Region For Channel": "/static/Landscape Images/Slide12.png",
+                "Sales and Growth By SubSegment for Channel For Retailer": "/static/Landscape Images/Slide12.png",
+                "Sales and Growth By SubSegment for Region For Channel": "/static/Landscape Images/Slide12.png",
+                "Sales and Growth By SubCategory for Channel For Retailer": "/static/Landscape Images/Slide12.png",
+                "Sales and Growth By SubCategory for Region For Channel": "/static/Landscape Images/Slide12.png",
+                "Momentum Analysis By Retailers": "/static/Landscape Images/Slide13.png",
+                "Momentum Analysis By Channels": "/static/Landscape Images/Slide13.png",
+                "Momentum Analysis By customarea": "/static/Landscape Images/Slide13.png",
+                "Momentum Analysis By Retailers By Segments": "/static/Landscape Images/Slide13.png",
+                "Momentum Analysis By Retailers By SubSegments": "/static/Landscape Images/Slide13.png",
+                "Momentum Analysis By Retailers By SubCategories": "/static/Landscape Images/Slide13.png",
+                "Momentum Analysis By Channels By Segments": "/static/Landscape Images/Slide13.png",
+                "Momentum Analysis By Channels By SubSegments": "/static/Landscape Images/Slide13.png",
+                "Momentum Analysis By Channels By SubCategories": "/static/Landscape Images/Slide13.png",
+                "Momentum Analysis By customarea By Segments": "/static/Landscape Images/Slide13.png",
+                "Momentum Analysis By customarea By SubSegments": "/static/Landscape Images/Slide13.png",
+                "Momentum Analysis By customarea By SubCategories": "/static/Landscape Images/Slide13.png",
+                "Revenue PVM By Manufacturer": "/static/Landscape Images/Slide14.png",
+                'Market Trends by Brands': '/static/Landscape Images/Slide1.png',
+                'Market Concentration By Brands': '/static/Landscape Images/Slide2.png',
+                'Market Growth By': '/static/Landscape Images/Slide3.png',
+                'Value Vs AvgPrice By': '/static/Landscape Images/Slide4.png',
+                'Share and Growth By Manufacturer/Brands': '/static/Landscape Images/Slide5.png',
+                'Share And Growth By Manufacturer By Retailer': '/static/Landscape Images/Slide8.png',
+                'Share And Growth By Manufacturer By': '/static/Landscape Images/Slide8.png',
+                'Category Trends': '/static/Landscape Images/Slide9.png',
+                'Share Evolution By Manuf': '/static/Landscape Images/Slide10.png',
+                'Share Evolution By Brand': '/static/Landscape Images/Slide10.png',
+                'Category Overview': '/static/Landscape Images/Slide11.png',
+                'Sales and Growth By Sector': '/static/Landscape Images/Slide12.png',
+                'Momentum Analysis By Retailers': '/static/Landscape Images/Slide14.png',
+                'Revenue PVM By Manufacturer': '/static/Landscape Images/Slide15.png',
+                'Value Vs AvgPrice By': '/static/PPA Images/Slide1.png',
+                'Brackets By Category': '/static/PPA Images/Slide2.png',
+                'Brackets By Retailer By Category': '/static/PPA Images/Slide2.png',
+                'Brackets By Channel By Category': '/static/PPA Images/Slide2.png',
+                'Brackets by Custom Areas': '/static/PPA Images/Slide2.png',
+                'Brackets By Sector': '/static/PPA Images/Slide3.png',
+                'Brackets By ParentxSegment': '/static/PPA Images/Slide4.png',
+                'Inter-size Discount': '/static/PPA Images/Slide5.png',
+                'Brand Elasticity':'/static/Pricing CBC Images/Slide1.png',
+                'Brand Sourcing Analysis':'/static/Pricing CBC Images/Slide2.png',
+                'Product Sourcing Analysis':'/static/Pricing CBC Images/Slide3.png',
+                'Price Elasticity Curve':'/static/Pricing CBC Images/Slide4.png',
+                'Revenue Response Analysis':'/static/Pricing CBC Images/Slide5.png',
+                'Innovation Summary': '/static/Inno CBC Images/Slide1.png',
+                'Innovation ranking' : '/static/Inno CBC Images/Slide3.png',
+                'Innovation potential' : '/static/Inno CBC Images/Slide8.png',
+                'Innovation sourcing' : '/static/Inno CBC Images/Slide12.png',
+                'SKU Share By Brand':'/static/Assortment Images/Slide1.png',
+                'SKU Share by Manuf':'/static/Assortment Images/Slide1.png',
+                'Cumulative Product Share':'/static/Assortment Images/Slide2.png',
+                'Top 50% cumulative share':'/static/Assortment Images/Slide3.png',
+                'Brand Cumulative Product Share':'/static/Assortment Images/Slide4.png',
+                'Top 20 cumulative share':'/static/Assortment Images/Slide5.png',
+                'SKU Productivity Analysis with TM%':'/static/Assortment Images/Slide6.png',
+                'SKU Productivity Analysis with WD':'/static/Assortment Images/Slide7.png',
+                'Fair Share':'/static/Assortment Images/Slide8.png',
+                'SKU Share By Brand with no client': '/static/Assortment Images/Slide1.png',
+                'Mix Analysis by brand':'/static/Financials Images/Slide1.png',
+                'Mix Analysis by Retailer for Region':'/static/Financials Images/Slide1.png',
+                'Mix Analysis by Retailer for Channel':'/static/Financials Images/Slide1.png',
+                'Mix Analysis by Retailer for Market':'/static/Financials Images/Slide1.png',
+                'Mix Analysis by Channel for Region':'/static/Financials Images/Slide1.png',
+                'Mix Analysis by Channel for Channel':'/static/Financials Images/Slide1.png',
+                'Mix Analysis by Channel for Market':'/static/Financials Images/Slide1.png',
+                'Mix Analysis by customarea for Region':'/static/Financials Images/Slide1.png',
+                'Mix Analysis by customarea for Channel':'/static/Financials Images/Slide1.png',
+                'Mix Analysis by customarea for Market':'/static/Financials Images/Slide1.png',
+                'Mix Analysis by Sector':'/static/Financials Images/Slide1.png',
+                'Mix Analysis by Segment':'/static/Financials Images/Slide1.png',
+                'Mix Analysis by Subsegment':'/static/Financials Images/Slide1.png',
+                'Mix Analysis by Subcategory':'/static/Financials Images/Slide1.png',
+                'Mix Analysis by {prodORitem}':'/static/Financials Images/Slide1.png',
+                'Trade Margin Analysis by Sector':'/static/Financials Images/Slide2.png',
+                'Trade Margin Analysis by Segment':'/static/Financials Images/Slide2.png',
+                'Trade Margin Analysis by Subsegment':'/static/Financials Images/Slide2.png',
+                'Trade Margin Analysis by Subcategory':'/static/Financials Images/Slide2.png',
+                'Sector KPI':'/static/Financials Images/Slide3.png',
+                'SKU KPIs Summary By Brand':'/static/Financials Images/Slide4.png',
+                'SKU KPIs Summary By Manufacture':'/static/Financials Images/Slide4.png',
+                'Mix Matrix By Retailer':'/static/Financials Images/Slide5.png',
+                'Mix Matrix By Channel':'/static/Financials Images/Slide5.png',
+                'Mix Matrix By Custom Region':'/static/Financials Images/Slide5.png',
+                'Mix Matrix by Brands by Sector':'/static/Financials Images/Slide6.png',
+                'Mix Matrix by Brands by Segment':'/static/Financials Images/Slide6.png',
+                'Mix Matrix by Brands by Subsegment':'/static/Financials Images/Slide6.png',
+                'Mix Matrix by Brands by Subcategory':'/static/Financials Images/Slide6.png',
+                'Sector Spending Pool':'/static/Financials Images/Slide7.png',
+                'Segment Spending Pool':'/static/Financials Images/Slide7.png',
+                'Subsegment Spending Pool':'/static/Financials Images/Slide7.png',
+                'Subcategory Spending Pool':'/static/Financials Images/Slide7.png',
+                'Product Spending Pool':'/static/Financials Images/Slide8.png',
+                'SKU Profitability':'/static/Financials Images/Slide9.png',
+                'Trade Margin Table By Sector':'/static/Financials Images/Slide10.png',
+                'Trade Margin Table By Segment':'/static/Financials Images/Slide10.png',
+                'Trade Margin Table By Subsegment':'/static/Financials Images/Slide10.png',
+                'Trade Margin Table By Subcategory':'/static/Financials Images/Slide10.png',
+                'Price Positioning Summary Category': '/static/Pricing Images/Slide15.png',
+                'Price Positioning Summary Sector': '/static/Pricing Images/Slide15.png',
+                'Price Positioning Summary Segment': '/static/Pricing Images/Slide15.png',
+                'Price Positioning Summary SubSegment': '/static/Pricing Images/Slide15.png',
+                'Price Positioning Summary SubCategory': '/static/Pricing Images/Slide15.png',
+                'Price Positioning Analysis By Brands': '/static/Pricing Images/Slide1.png',
+                'Price Positioning Analysis By Manufacturer': '/static/Pricing Images/Slide1.png',
+                'Sector Share and Growth By Brands': '/static/Pricing Images/Slide2.png',
+                'Segment Share and Growth By Brands': '/static/Pricing Images/Slide2.png',
+                'SubSegment Share and Growth By Brands': '/static/Pricing Images/Slide2.png',
+                'SubCategory Share and Growth By Brands': '/static/Pricing Images/Slide2.png',
+                'Sector Share and Growth By Manufacturer': '/static/Pricing Images/Slide2.png',
+                'Segment Share and Growth By Manufacturer': '/static/Pricing Images/Slide2.png',
+                'SubSegment Share and Growth By Manufacturer': '/static/Pricing Images/Slide2.png',
+                'SubCategory Share and Growth By Manufacturer': '/static/Pricing Images/Slide2.png',
+                'Sec/Seg Value Sales Vs Avg Price By Manufacturer': '/static/Pricing Images/Slide4.png',
+                'Value Sales Vs Avg Price': '/static/Pricing Images/Slide4.png',
+                'Avg Price/Vol Comparison': '/static/Pricing Images/Slide5.png',
+                'Shelf Price/Vol Comparison': '/static/Pricing Images/Slide6.png',
+                'Price Point Distribution Analysis P3M': '/static/Pricing Images/Slide7.png',
+                'Price Point Distribution Analysis P12M': '/static/Pricing Images/Slide7.png',
+                'Price Point Distribution Analysis P3M ByManuf': '/static/Pricing Images/Slide7.png',
+                'Price Point Distribution Analysis P12M ByManuf': '/static/Pricing Images/Slide7.png',
+                'Price Point Distribution Scraped': '/static/Pricing Images/Slide16.png',
+                'Price Point Distribution Scraped ByManuf': '/static/Pricing Images/Slide16.png',
+                'Price Point Comparison Analysis by Manuf': '/static/Pricing Images/Slide8.png',
+                'Price Point Comparison Analysis': '/static/Pricing Images/Slide8.png',
+                'Price Point Comparison Analysis by Product Scraped': '/static/Pricing Images/Slide27.png',
+                'Price Point Comparison Analysis by Manuf Scraped': '/static/Pricing Images/Slide17.png',
+                'Price Point Distribution Analysis By Brand': '/static/Pricing Images/Slide9.png',
+                'Price Point Distribution Analysis By Brand By': '/static/Pricing Images/Slide10.png',
+                'Category Price Correlation Analysis P3Y': '/static/Pricing Images/Slide11.png',
+                'PromoEvolution':'/static/Promotion Images/Slide1.png',
+                'VSODSummarybySector':'/static/Promotion Images/Slide2.png',
+                'ValueUpliftbyretailerbybrand':'/static/Promotion Images/Slide3.png',
+                'VolumeUpliftvsdiscountdepth':'/static/Promotion Images/Slide4.png',
+                'ValueUpliftvsPromoEfficiencyQuadrant':'/static/Promotion Images/Slide5.png',
+                'Top 20 promotions':'/static/Promotion Images/Slide6.png',
+                'Top 20 promotions CLIENT ONLY':'/static/Promotion Images/Slide7.png',
+                'Bottom 20 promotions CLIENT ONLY':'/static/Promotion Images/Slide8.png',
+                'Volume Sold on Deal':'/static/Promotion Images/Slide9.png',
+                'Promo share vs Value Share': '/static/Promotion Images/Slide10.png',
+                'Promo Sales by total size': '/static/Promotion Images/Slide11.png',
+                'Promo Sales by promo type': '/static/Promotion Images/Slide12.png',
+                'Feature Share vs Fair Share': '/static/Promotion Images/Slide13.png',
+                'Display Share vs Fair Share': '/static/Promotion Images/Slide14.png',
+                'Promo Frequency learnings': '/static/Promotion Images/Slide15.png',
+                'Promo sales per retailer': '/static/Promotion Images/Slide18.png',
+                'Value uplift vs discount depth': '/static/Promotion Images/Slide20.png',
+                'Seasonality Index': '/static/Promotion Images/Slide23.png',
+                'Promotional Frequency Analysis': '/static/Promotion Images/Slide29.png',
+                'Promo Evolution no client prio': '/static/Promotion Images/Slide1.png',
+                'VSOD Summary by Sector no client prio': '/static/Promotion Images/Slide2.png',
+                'Value uplift by retailer by brand no client prio': '/static/Promotion Images/Slide3.png',
+                'Promo share vs Value Share no client prio': '/static/Promotion Images/Slide10.png',
+                'Promo Sales by total size no client prio': '/static/Promotion Images/Slide11.png',
+                'Promo Sales by promo type no client prio': '/static/Promotion Images/Slide12.png',
+                'Feature Share vs Fair Share no client prio': '/static/Promotion Images/Slide13.png',
+                'Display Share vs Fair Share no client prio': '/static/Promotion Images/Slide14.png'
+            };
+                
+
+            // Create preview element
+            const previewDiv = document.createElement('div');
+            previewDiv.className = 'slide-preview';
+            previewDiv.innerHTML = `
+                <div class="slide-preview-title"></div>
+                <img src="" alt="Slide Preview" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'padding: 20px; text-align: center; color: #666;\'>Preview not available</div>'">
+            `;
+            document.body.appendChild(previewDiv);
+
+            // Add hover events to all promotion slide labels
+            const slideLabels = document.querySelectorAll('.checklist-container .form-check-label');
+            
+            slideLabels.forEach(label => {
+                const slideInput = document.getElementById(label.getAttribute('for'));
+                const slideName = slideInput ? slideInput.value : '';
+                console.log('slideName:', JSON.stringify(slideName), 'SlideImages:',JSON.stringify(slideImages[slideName]))
+                if (slideName && slideImages[slideName]) {
+
+                    label.addEventListener('mouseenter', function(e) {
+                        const img = previewDiv.querySelector('img');
+                        const title = previewDiv.querySelector('.slide-preview-title');
+                        
+                        title.textContent = slideName;
+                        img.src = slideImages[slideName];
+                        previewDiv.style.display = 'block';
+
+                        // Position preview near cursor
+                        const previewHeight = previewDiv.offsetHeight;
+                        const rect = label.getBoundingClientRect();
+                        const previewWidth = previewDiv.offsetWidth;
+
+                        let top = e.clientY + 20;  // 20px below cursor
+                        let left = e.clientX + 20; // 20px to the right of cursor
+
+                        // Clamp bottom overflow
+                        if (top + previewHeight > window.innerHeight) {
+                            top = window.innerHeight - previewHeight - 20;
+                        }
+
+                        // Clamp right overflow
+                        if (left + previewWidth > window.innerWidth) {
+                            left = window.innerWidth - previewWidth - 20;
+                        }
+
+                        previewDiv.style.top = `${top}px`;
+                        previewDiv.style.left = `${left}px`;
+                        // previewDiv.style.left = `${rect.right + window.scrollX + 100}px`;
+                        // previewDiv.style.top = `${rect.top + window.scrollY -previewHeight-50}px`;
+                    });
+                    
+                    label.addEventListener('mouseleave', function() {
+                        previewDiv.style.display = 'none';
+                    });
+                }
+            });
+        });
+    </script>
+    <!-- Loading Spinner -->
+
+<div id="loadingOverlay" style="
+  display: none; 
+  position: fixed; 
+  top: 0; left: 0; 
+  width: 100%; height: 100%; 
+  background: rgba(255,255,255,0.8); 
+  z-index: 9999; 
+  justify-content: center; 
+  align-items: center;
+  flex-direction: column;
+">
+  <div class="spinner-border text-primary" style="width: 5rem; height: 5rem;" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <p style="margin-top: 20px; font-size: 1.2rem; color: #00a097;">Processing, please wait...</p>
+</div>
+</body>
+</html>
